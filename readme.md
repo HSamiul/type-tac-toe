@@ -14,5 +14,5 @@ Project to learn and showcase basic react concepts
 You can write a function that returns a `JSX.Element`. This is a fast alternative to write an entire class
 that represents a `JSX.Element`.
 
-If a custom element doesn't track state, then a function is sufficient. For example, a `Square` doesn't care
-about its own state while a `Board` does.
+Function components are sufficient when all they need are props and don't care about state.
+Class components are sufficient when we care about props and state and want to define helper functions (E.g, a `Board` needing a `renderSquare(i)` method)

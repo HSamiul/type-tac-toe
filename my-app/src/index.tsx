@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getDefaultCompilerOptions } from 'typescript';
 import './index.css';
 
 /* Individual squares are not concerned with state. The board holds the square's props as its own state. The board modifies squares
@@ -29,11 +28,7 @@ type BoardProps = {
   onClick: (i: number) => void
 }
 
-type BoardState = {
-  squares: Array<string|undefined>,
-}
-
-class Board extends React.Component<BoardProps, BoardState> {  
+class Board extends React.Component<BoardProps> {  
   renderSquare(i: number) {
     return (
       <Square 
@@ -70,40 +65,61 @@ type GameProps = {
 }
 
 type GameState = {
-  history: BoardState[],
-  xIsNext: boolean
+  history: (Array<string|undefined>)[],
+  xIsNext: boolean,
+  stepNumber: number
 }
 
 class Game extends React.Component<GameProps, GameState> {
   constructor(props: GameProps) {
     super(props)
     this.state = {
-      history: [{ squares: new Array<undefined>(9) }],
-      xIsNext: true
+      history: [new Array<undefined>(9)],
+      stepNumber: 0,
+      xIsNext: true,
     }
   }
 
-    /* A parent passes its state (mutable) down to its children as a prop (immutable). Board -> square */
-    handleClick(i: number) {
-      const history = this.state.history
-      const current = this.state.history[history.length - 1]
-      const squares = current.squares.slice()
-
-      if (calculateWinner(squares) !== undefined) { return } /* if someone's already won, do nothing */
-      if (squares[i] !== undefined) { return } /* if a filled square is clicked, do nothing */
-  
-      squares[i] = this.state.xIsNext ? "X" : "O" /* ternary operator go brrr  */
-      this.setState({
-        history: history.concat([{squares: squares}]), /* concat doesn't modify the involved arrays, which is good for immutability */
-        xIsNext: !this.state.xIsNext
-      })
-    }
-  
-
-  render() {
-    const history = this.state.history
+  /* A parent passes its state (mutable) down to its children as a prop (immutable). Board -> square */
+  handleClick(i: number): void {
+    const history = this.state.history.slice(0, this.state.stepNumber + 1)
     const current = this.state.history[history.length - 1]
-    const winner = calculateWinner(current.squares)
+    const squares = current.slice()
+
+    if (calculateWinner(squares) !== undefined) { return } /* if someone's already won, do nothing */
+    if (squares[i] !== undefined) { return } /* if a filled square is clicked, do nothing */
+
+    squares[i] = this.state.xIsNext ? "X" : "O" /* ternary operator go brrr  */
+    this.setState({
+      history: history.concat([squares]), /* concat doesn't modify the involved arrays, which is good for immutability */
+      stepNumber: history.length,
+      xIsNext: !this.state.xIsNext
+    })
+  }
+  
+  jumpTo(step: number): void {
+    this.setState({
+      stepNumber: step,
+      xIsNext: (step % 2) === 0
+    })
+  }
+
+  render(): JSX.Element {
+    const history = this.state.history
+    const current = history[this.state.stepNumber]
+    const winner = calculateWinner(current)
+
+    const moves = history.map((step, move) => {
+      const desc = move ?
+        'Go to move #' + move :
+        'Go to game start';
+      return (
+        <li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        </li>
+      );
+    });
+
     let status;
 
     if (winner !== undefined) {
@@ -116,11 +132,11 @@ class Game extends React.Component<GameProps, GameState> {
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={current.squares} onClick={ (i) => this.handleClick(i) }/>
+          <Board squares={current} onClick={ (i) => this.handleClick(i) }/>
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     );

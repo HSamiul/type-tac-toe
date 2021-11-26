@@ -9,3 +9,10 @@ Project to learn and showcase basic react concepts
 * `npm install --save-dev @types/react-dom`
 * `create-react-app my-app typescript`
 3. Use `yarn` to build and run app (see generated `readme.md` after running the above)
+
+### Function components
+You can write a function that returns a `JSX.Element`. This is a fast alternative to write an entire class
+that represents a `JSX.Element`.
+
+If a custom element doesn't track state, then a function is sufficient. For example, a `Square` doesn't care
+about its own state while a `Board` does.

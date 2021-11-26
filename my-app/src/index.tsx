@@ -2,6 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+/* Individual squares are not concerned with state. The board holds the square's states and modifies them
+ * by passing its own state down as a prop to the squares. See handleClick(i) as a concrete example of this.
+ *
+ * Whenever a square is clicked, the board's handeClick(i) function is called (<Square onClick=handleClick(i))
+*/
+
 /* make a property (props) and state definition for squares */
 type SquareProps = {
   value: string|undefined /* a square is either X, O, or empty/undefined */

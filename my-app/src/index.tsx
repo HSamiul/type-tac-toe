@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { getDefaultCompilerOptions } from 'typescript';
 import './index.css';
 
-/* Individual squares are not concerned with state. The board holds the square's states and modifies them
+/* Individual squares are not concerned with state. The board holds the square's props as its own state. The board modifies squares
  * by passing its own state down as a prop to the squares. See handleClick(i) as a concrete example of this.
  *
  * Whenever a square is clicked, the board's handeClick(i) function is called (<Square onClick=handleClick(i))
@@ -25,58 +26,25 @@ return (
 
 type BoardProps = {
   squares: Array<string|undefined>, /* a board's squares must be X, O, or empty/undefined */
-  xIsNext: boolean,
+  onClick: (i: number) => void
 }
 
 type BoardState = {
   squares: Array<string|undefined>,
-  xIsNext: boolean
 }
 
-class Board extends React.Component<BoardProps, BoardState> {
-  constructor (props: BoardProps) {
-    super(props)
-    this.state = {
-      squares: new Array<undefined>(9),
-      xIsNext: true
-    }
-  }
-  
-  /* A parent passes its state (mutable) down to its children as a prop (immutable). Board -> square */
-  handleClick(i: number) {
-    if (calculateWinner(this.state.squares) !== undefined) { return } /* if someone's already won, do nothing */
-    if (this.state.squares[i] !== undefined) { return } /* if a filled square is clicked, do nothing */
-
-    const squares = this.state.squares.slice()
-    squares[i] = this.state.xIsNext ? "X" : "O" /* ternary operator go brrr  */
-    
-    this.setState({
-      squares: squares,
-      xIsNext: !this.state.xIsNext
-    })
-  }
-
+class Board extends React.Component<BoardProps, BoardState> {  
   renderSquare(i: number) {
     return (
       <Square 
-        value={this.state.squares[i]} 
-        onClick={() => this.handleClick(i)} />
+        value={this.props.squares[i]} 
+        onClick={() => this.props.onClick(i)} />
     )
   }
 
   render() {
-    const winner = calculateWinner(this.state.squares)
-    let status;
-    if (winner !== undefined) {
-      status = "Winner: " + winner
-    }
-    else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O")
-    }
-
     return (
       <div>
-        <div className="status">{status}</div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -97,15 +65,61 @@ class Board extends React.Component<BoardProps, BoardState> {
   }
 }
 
-class Game extends React.Component {
+type GameProps = {
+  xIsNext: boolean
+}
+
+type GameState = {
+  history: BoardState[],
+  xIsNext: boolean
+}
+
+class Game extends React.Component<GameProps, GameState> {
+  constructor(props: GameProps) {
+    super(props)
+    this.state = {
+      history: [{ squares: new Array<undefined>(9) }],
+      xIsNext: true
+    }
+  }
+
+    /* A parent passes its state (mutable) down to its children as a prop (immutable). Board -> square */
+    handleClick(i: number) {
+      const history = this.state.history
+      const current = this.state.history[history.length - 1]
+      const squares = current.squares.slice()
+
+      if (calculateWinner(squares) !== undefined) { return } /* if someone's already won, do nothing */
+      if (squares[i] !== undefined) { return } /* if a filled square is clicked, do nothing */
+  
+      squares[i] = this.state.xIsNext ? "X" : "O" /* ternary operator go brrr  */
+      this.setState({
+        history: history.concat([{squares: squares}]), /* concat doesn't modify the involved arrays, which is good for immutability */
+        xIsNext: !this.state.xIsNext
+      })
+    }
+  
+
   render() {
+    const history = this.state.history
+    const current = this.state.history[history.length - 1]
+    const winner = calculateWinner(current.squares)
+    let status;
+
+    if (winner !== undefined) {
+      status = "Winner: " + winner
+    }
+    else {
+      status = "Next player: " + (this.state.xIsNext ? "X" : "O")
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={new Array<undefined>(9)} xIsNext={true}/>
+          <Board squares={current.squares} onClick={ (i) => this.handleClick(i) }/>
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{status}</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
@@ -137,6 +151,6 @@ function calculateWinner(squares: Array<string|undefined>): string|undefined {
 // ========================================
 
 ReactDOM.render(
-  <Game />,
+  <Game xIsNext={true}/>,
   document.getElementById('root')
 );

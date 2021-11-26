@@ -100,7 +100,7 @@ class Game extends React.Component<GameProps, GameState> {
   jumpTo(step: number): void {
     this.setState({
       stepNumber: step,
-      xIsNext: (step % 2) === 0
+      xIsNext: (step % 2) === 0 /* since x is first (1), this is a valid way to determine the turn */
     })
   }
 
@@ -117,8 +117,8 @@ class Game extends React.Component<GameProps, GameState> {
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
-      );
-    });
+      )
+    })
 
     let status;
 

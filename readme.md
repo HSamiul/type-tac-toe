@@ -1,18 +1,25 @@
-Project to learn and showcase basic react concepts
+This is a typescript version of the [react tutorial](https://reactjs.org/tutorial/tutorial.html).
+The intention of this project was to introduce myself to React with the challenge of using Typescript instead of the native Javascript from the tutorial.
+Feel free to peak into `index.tsx` to see documentation I left for myself to understand how react works.
 
-### How to start a react project
-1. Navigate to project directory in terminal
-2. Run the following commands
-* `npm install react`
-* `npm install typescript`
-* `npm install --save-dev @types/react`
-* `npm install --save-dev @types/react-dom`
-* `create-react-app my-app typescript`
-3. Use `yarn` to build and run app (see generated `readme.md` after running the above)
+## Available Scripts
 
-### Function components
-You can write a function that returns a `JSX.Element`. This is a fast alternative to write an entire class
-that represents a `JSX.Element`.
+In the project directory, you can run:
 
-Function components are sufficient when all they need are props and don't care about state.
-Class components are sufficient when we care about props and state and want to define helper functions (E.g, a `Board` needing a `renderSquare(i)` method)
+### `yarn start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `yarn build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
